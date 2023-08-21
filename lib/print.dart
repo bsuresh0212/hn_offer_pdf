@@ -122,7 +122,7 @@ pw.Widget grid(Product e) {
                           style: pw.TextStyle(
                             fontWeight: pw.FontWeight.bold,
                             fontStyle: pw.FontStyle.italic,
-                            fontSize: 40,
+                            fontSize: 50,
                           ),
                         ),
                         pw.SizedBox(width: 5),
@@ -184,7 +184,7 @@ pw.Widget grid(Product e) {
                           pw.Text('Our Price :-',
                             style: pw.TextStyle(
                               fontWeight: pw.FontWeight.bold,
-                              fontSize: 18,
+                              fontSize: 19,
                             ),
                           ),
                           pw.Text('\u{20B9} ${e.selling.toInt().toString()}',

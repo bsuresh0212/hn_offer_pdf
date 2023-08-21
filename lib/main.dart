@@ -20,11 +20,10 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: const PrepareList(),
+      home: const printPage(),
     );
   }
 }
-/*
 
 class printPage extends StatefulWidget {
   const printPage({Key? key}) : super(key: key);
@@ -40,17 +39,15 @@ class _printPageState extends State<printPage> {
       appBar: AppBar(
         title: Text('Print'),
       ),
-     */
-/* body: PdfPreview(
+ body: PdfPreview(
         maxPageWidth: 700,
         build: (format) => generateInvoice()
-      ),*//*
+      ),
 
-      body: PrepareList(),
+      // body: PrepareList(),
     );
   }
 }
-*/
 
 
 
