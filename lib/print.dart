@@ -19,25 +19,13 @@ import 'dart:typed_data';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show rootBundle;
+import 'package:hn_pdf/models/priceList.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
 
-Future<Uint8List> generateInvoice() async {
-  List<Product> data = [];
-  data.add(const Product('Sakthi Kolumbu Milaigai thool', '50g', 28, 16));
-  data.add(const Product('Sakthi Coriander Power', '50g', 50, 16));
-  data.add(const Product('Sakthi Coriander Power', '50g', 19, 16));
-  data.add(const Product('Sakthi Coriander Power', '50g', 19, 16));
-  data.add(const Product('Sakthi Coriander Power', '50g', 19, 16));
-  data.add(const Product('Sakthi Coriander Power', '50g', 19, 16));
-  data.add(const Product('Sakthi Coriander Power', '50g', 19, 16));
-  data.add(const Product('Sakthi Coriander Power', '50g', 19, 16));
-  data.add(const Product('Sakthi Coriander Power', '50g', 19, 16));
-  data.add(const Product('Sakthi Coriander Power', '50g', 19, 16));
-  data.add(const Product('Sakthi Coriander Power', '50g', 19, 16));
-  data.add(const Product('Sakthi Coriander Power', '50g', 19, 16));
-  data.add(const Product('Sakthi Coriander Power', '50g', 19, 16));
+Future<Uint8List> generateInvoice(List<PriceListData> printingList) async {
+  final List<PriceListData> data = printingList;
   final priceList = PriceList(list: data);
 
   return await priceList.buildPdf(PdfPageFormat.standard);
@@ -45,7 +33,7 @@ Future<Uint8List> generateInvoice() async {
 
 class PriceList {
   PriceList({required this.list});
-  final List<Product> list;
+  final List<PriceListData> list;
 
   Future<Uint8List> buildPdf(PdfPageFormat pageFormat) async {
     // Create a PDF document.
@@ -81,7 +69,7 @@ class PriceList {
   }
 }
 
-pw.Widget gridViewPrepare(List<Product> list) {
+pw.Widget gridViewPrepare(List<PriceListData> list) {
   return pw.Container(
     width: double.infinity,
     child:  pw.Wrap(
@@ -96,7 +84,8 @@ pw.Widget gridViewPrepare(List<Product> list) {
 
 }
 
-pw.Widget grid(Product e) {
+pw.Widget grid(PriceListData product) {
+  Product final_product = Product(product.name, product.weight, product.mrp, product.selling);
   return
       pw.Container(
         decoration: pw.BoxDecoration(
@@ -112,17 +101,17 @@ pw.Widget grid(Product e) {
                       mainAxisAlignment: pw.MainAxisAlignment.center,
                       crossAxisAlignment: pw.CrossAxisAlignment.end,
                       children: [
-                        pw.Text('\u{20B9}',
+                        pw.Text('₹',
                           style: pw.TextStyle(
                             fontSize: 25,
                           ),
                         ),
                         pw.SizedBox(width: 3),
-                        pw.Text(e.discount.toInt().toString(),
+                        pw.Text(final_product.discount.toInt().toString(),
                           style: pw.TextStyle(
                             fontWeight: pw.FontWeight.bold,
                             fontStyle: pw.FontStyle.italic,
-                            fontSize: 50,
+                            fontSize: 55,
                           ),
                         ),
                         pw.SizedBox(width: 5),
@@ -140,13 +129,13 @@ pw.Widget grid(Product e) {
                     child: pw.RichText(
                         textAlign: pw.TextAlign.center,
                         text: pw.TextSpan(
-                            text: '${e.name} ',
+                            text: '${final_product.name} ',
                             style: pw.TextStyle(
                               fontSize: 19,
                             ),
                             children: [
                               pw.TextSpan(
-                                text: e.weight,
+                                text: final_product.weight,
                                 style: pw.TextStyle(
                                   fontWeight: pw.FontWeight.bold,
                                   fontSize: 20,
@@ -168,7 +157,7 @@ pw.Widget grid(Product e) {
                               fontSize: 18,
                             ),
                           ),
-                          pw.Text('\u{20B9} ${e.mrp.toInt().toString()}',
+                          pw.Text('₹ ${final_product.mrp.toInt().toString()}',
                             style: pw.TextStyle(
                               fontSize: 18,
                             ),
@@ -187,7 +176,7 @@ pw.Widget grid(Product e) {
                               fontSize: 19,
                             ),
                           ),
-                          pw.Text('\u{20B9} ${e.selling.toInt().toString()}',
+                          pw.Text('₹ ${final_product.selling.toInt().toString()}',
                             style: pw.TextStyle(
                               fontWeight: pw.FontWeight.bold,
                               fontSize: 20,
@@ -214,10 +203,10 @@ class Product {
 
   final String name;
   final String weight;
-  final double mrp;
+  final int mrp;
   final int selling;
 
-  double get discount => mrp - selling;
+  int get discount => mrp - selling;
 
   @override
   String toString() {

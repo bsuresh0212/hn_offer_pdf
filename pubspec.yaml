@@ -37,6 +37,8 @@ dependencies:
   cupertino_icons: ^1.0.2
   pdf: ^3.10.4
   printing: ^5.11.0
+  flutter_secure_storage: ^8.0.0
+  recase: ^4.1.0
 
 dev_dependencies:
   flutter_test:
