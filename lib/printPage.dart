@@ -17,7 +17,7 @@ class _printPageState extends State<printPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Print'),
+        title: const Text('Print'),
       ),
       body: PdfPreview(
           maxPageWidth: 700,

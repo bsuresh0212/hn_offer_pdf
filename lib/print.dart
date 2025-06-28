@@ -16,13 +16,11 @@
 
 import 'dart:typed_data';
 
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:hn_pdf/models/priceList.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
-import 'package:printing/printing.dart';
+import 'package:pdf/widgets.dart';
 
 Future<Uint8List> generateInvoice(List<PriceListData> printingList) async {
   final List<PriceListData> data = printingList;
@@ -43,13 +41,11 @@ class PriceList {
       pw.MultiPage(
         pageTheme: _buildTheme(
           pageFormat,
-          await PdfGoogleFonts.overpassRegular(),
-          await PdfGoogleFonts.overpassBold(),
-          await PdfGoogleFonts.robotoItalic(),
+          Font.ttf(await rootBundle.load("assets/Overpass-Regular.ttf")),
+          Font.ttf(await rootBundle.load("assets/Overpass-Bold.ttf")),
+          Font.ttf(await rootBundle.load("assets/Overpass-Italic.ttf")),
         ),
-        build: (context) => [
-          gridViewPrepare(list)
-        ],
+        build: (context) => [gridViewPrepare(list)],
       ),
     );
     // Return the PDF file content
@@ -60,7 +56,7 @@ class PriceList {
       PdfPageFormat pageFormat, pw.Font base, pw.Font bold, pw.Font italic) {
     return pw.PageTheme(
         pageFormat: pageFormat,
-        margin: pw.EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+        margin: const pw.EdgeInsets.symmetric(horizontal: 20, vertical: 20),
         theme: pw.ThemeData.withFont(
           base: base,
           bold: bold,
@@ -71,126 +67,116 @@ class PriceList {
 
 pw.Widget gridViewPrepare(List<PriceListData> list) {
   return pw.Container(
-    width: double.infinity,
-    child:  pw.Wrap(
-
-        children: [
-          ...list.map((c) => grid(c))
-        ]
-    )
-  );
-
-
-
+      width: double.infinity,
+      child: pw.Wrap(children: [...list.map((c) => grid(c))]));
 }
 
 pw.Widget grid(PriceListData product) {
-  Product final_product = Product(product.name, product.weight, product.mrp, product.selling);
-  return
-      pw.Container(
-        decoration: pw.BoxDecoration(
-          border: pw.Border.all()
+  Product final_product =
+      Product(product.name, product.weight, product.mrp, product.selling);
+  return pw.Container(
+      decoration: pw.BoxDecoration(border: pw.Border.all()),
+      height: 250,
+      width: 180,
+      child: pw.Column(children: [
+        pw.Expanded(
+          child: pw.Column(
+              mainAxisAlignment: pw.MainAxisAlignment.center,
+              children: [
+                pw.Row(
+                    mainAxisAlignment: pw.MainAxisAlignment.center,
+                    crossAxisAlignment: pw.CrossAxisAlignment.end,
+                    children: [
+                      pw.Text(
+                        '₹',
+                        style: const pw.TextStyle(
+                          fontSize: 25,
+                        ),
+                      ),
+                      // pw.SizedBox(width: 1),
+                      pw.Text(
+                        final_product.discount.toInt().toString(),
+                        style: pw.TextStyle(
+                          fontWeight: pw.FontWeight.bold,
+                          fontStyle: pw.FontStyle.italic,
+                          fontSize: 55,
+                        ),
+                      ),
+                      pw.SizedBox(width: 5),
+                      pw.Text(
+                        'Off',
+                        style: pw.TextStyle(
+                          fontWeight: pw.FontWeight.bold,
+                          fontSize: 20,
+                        ),
+                      )
+                    ]),
+                pw.SizedBox(height: 25),
+                pw.Padding(
+                  padding: const pw.EdgeInsets.symmetric(horizontal: 10.0),
+                  child: pw.RichText(
+                      textAlign: pw.TextAlign.center,
+                      text: pw.TextSpan(
+                          text: '${final_product.name} ',
+                          style: const pw.TextStyle(
+                            fontSize: 19,
+                          ),
+                          children: [
+                            pw.TextSpan(
+                              text: final_product.weight,
+                              style: pw.TextStyle(
+                                fontWeight: pw.FontWeight.bold,
+                                fontSize: 20,
+                              ),
+                            )
+                          ])),
+                ),
+                // pw.SizedBox(height: 50),
+              ]),
         ),
-        height: 250,
-        width: 180,
-        child: pw.Expanded(
-            child : pw.Column(
-                mainAxisAlignment: pw.MainAxisAlignment.center,
+        pw.Column(children: [
+          pw.Padding(
+            padding: const pw.EdgeInsets.symmetric(horizontal: 10.0),
+            child: pw.Row(
+                mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
                 children: [
-                  pw.Row(
-                      mainAxisAlignment: pw.MainAxisAlignment.center,
-                      crossAxisAlignment: pw.CrossAxisAlignment.end,
-                      children: [
-                        pw.Text('₹',
-                          style: pw.TextStyle(
-                            fontSize: 25,
-                          ),
-                        ),
-                        pw.SizedBox(width: 3),
-                        pw.Text(final_product.discount.toInt().toString(),
-                          style: pw.TextStyle(
-                            fontWeight: pw.FontWeight.bold,
-                            fontStyle: pw.FontStyle.italic,
-                            fontSize: 55,
-                          ),
-                        ),
-                        pw.SizedBox(width: 5),
-                        pw.Text('Off',
-                          style: pw.TextStyle(
-                            fontWeight: pw.FontWeight.bold,
-                            fontSize: 20,
-                          ),
-                        )
-                      ]
-                  ),
-                  pw.SizedBox(height: 25),
-                  pw.Padding(
-                    padding: pw.EdgeInsets.symmetric(horizontal: 10.0),
-                    child: pw.RichText(
-                        textAlign: pw.TextAlign.center,
-                        text: pw.TextSpan(
-                            text: '${final_product.name} ',
-                            style: pw.TextStyle(
-                              fontSize: 19,
-                            ),
-                            children: [
-                              pw.TextSpan(
-                                text: final_product.weight,
-                                style: pw.TextStyle(
-                                  fontWeight: pw.FontWeight.bold,
-                                  fontSize: 20,
-                                ),
-                              )
-                            ]
-
-                        )
+                  pw.Text(
+                    'MRP :-',
+                    style: const pw.TextStyle(
+                      fontSize: 18,
                     ),
                   ),
-                  pw.SizedBox(height: 50),
-                  pw.Padding(
-                    padding: pw.EdgeInsets.symmetric(horizontal: 10.0),
-                    child: pw.Row(
-                        mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
-                        children: [
-                          pw.Text('MRP :-',
-                            style: pw.TextStyle(
-                              fontSize: 18,
-                            ),
-                          ),
-                          pw.Text('₹ ${final_product.mrp.toInt().toString()}',
-                            style: pw.TextStyle(
-                              fontSize: 18,
-                            ),
-                          )
-                        ]
+                  pw.Text(
+                    '₹ ${final_product.mrp.toInt().toString()}',
+                    style: const pw.TextStyle(
+                      fontSize: 18,
+                    ),
+                  )
+                ]),
+          ),
+          pw.Padding(
+            padding: const pw.EdgeInsets.symmetric(horizontal: 10.0),
+            child: pw.Row(
+                mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                children: [
+                  pw.Text(
+                    'Our Price :-',
+                    style: pw.TextStyle(
+                      fontWeight: pw.FontWeight.bold,
+                      fontSize: 19,
                     ),
                   ),
-                  pw.Padding(
-                    padding: pw.EdgeInsets.symmetric(horizontal: 10.0),
-                    child: pw.Row(
-                        mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
-                        children: [
-                          pw.Text('Our Price :-',
-                            style: pw.TextStyle(
-                              fontWeight: pw.FontWeight.bold,
-                              fontSize: 19,
-                            ),
-                          ),
-                          pw.Text('₹ ${final_product.selling.toInt().toString()}',
-                            style: pw.TextStyle(
-                              fontWeight: pw.FontWeight.bold,
-                              fontSize: 20,
-                            ),
-                          )
-                        ]
+                  pw.Text(
+                    '₹${final_product.selling.toInt().toString()}',
+                    style: pw.TextStyle(
+                      fontWeight: pw.FontWeight.bold,
+                      fontSize: 22,
                     ),
-                  ),
-
-                ]
-            )
-        )
-
-  );
+                  )
+                ]),
+          ),
+        ]),
+      ]));
 }
 
 class Product {
@@ -210,6 +196,6 @@ class Product {
 
   @override
   String toString() {
-    return 'Product: {name: ${name}, weight: ${weight} , mrp: ${mrp}, selling: ${selling}, discount : ${discount}';
+    return 'Product: {name: $name, weight: $weight , mrp: $mrp, selling: $selling, discount : $discount';
   }
 }

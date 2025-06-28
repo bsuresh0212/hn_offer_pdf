@@ -8,7 +8,6 @@ import 'package:hn_pdf/widgets/circular.dart';
 
 import 'models/priceList.dart';
 import 'models/storageItem.dart';
-import 'package:recase/recase.dart';
 
 class PrepareList extends StatefulWidget {
   const PrepareList({Key? key}) : super(key: key);
@@ -33,7 +32,7 @@ class _PrepareListState extends State<PrepareList> {
   getPriceList() async {
     final savedList = await _storeService.readSecureData('printingList');
     if (savedList != null && savedList.isNotEmpty) {
-    final res = PriceListDataFromJson(json.decode(savedList!));
+    final res = PriceListDataFromJson(json.decode(savedList));
       if (res.isNotEmpty) {
         setState(() {
           printingList = res;
@@ -54,7 +53,6 @@ class _PrepareListState extends State<PrepareList> {
   }
 
   void onTap(bool isSelected, int index) {
-    print(isSelected);
     if (isSelectionMode) {
       setState(() {
         selectedFlag[index] = !isSelected;
@@ -83,7 +81,6 @@ class _PrepareListState extends State<PrepareList> {
   }
 
   updateItem(PriceListData data, int index) {
-    print(data.toString());
     bottomSheet(context, data).then((value) {
       setState(() {
         if(value != null) {
@@ -137,7 +134,7 @@ class _PrepareListState extends State<PrepareList> {
                     height: 75,
                     child: ListTile(
                       title: Text('${data.name} (${data.weight})'),
-                      onTap: () => onTap(isSelected!, index),
+                      onTap: () => onTap(isSelected, index),
                       subtitle: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
@@ -184,12 +181,11 @@ Future<dynamic> bottomSheet(context, PriceListData priceListData) {
   final itemMRPController = TextEditingController();
   final itemSellingController = TextEditingController();
 
-  if(priceListData != null) {
-    itemController.text = priceListData.name;
-    itemWtController.text = priceListData.weight;
-    itemMRPController.text = priceListData.mrp == 0 ?  '' : priceListData.mrp.toString();
-    itemSellingController.text = priceListData.selling == 0 ? '' : priceListData.selling.toString();
-  }
+
+  itemController.text = priceListData.name;
+  itemWtController.text = priceListData.weight;
+  itemMRPController.text = priceListData.mrp == 0 ?  '' : priceListData.mrp.toString();
+  itemSellingController.text = priceListData.selling == 0 ? '' : priceListData.selling.toString();
 
   errDialog() {
     showDialog<String>(
@@ -213,8 +209,18 @@ Future<dynamic> bottomSheet(context, PriceListData priceListData) {
         itemSellingController.text.trim().isEmpty) {
       errDialog();
     } else {
-      final PriceListData newProduct = PriceListData(name: itemController.text, weight: itemWtController.text, mrp: int.parse(itemMRPController.text), selling: int.parse(itemSellingController.text));
-      Navigator.pop(context, newProduct);
+      try {
+        String inputSentence = itemController.text.trim();
+        List<String> words = inputSentence.split(' ');
+        List<String> capitalizedWords = [...words.map((s) => s[0].toUpperCase() + s.substring(1))];
+        inputSentence = capitalizedWords.join(' ');
+        final PriceListData newProduct = PriceListData(name: inputSentence, weight: itemWtController.text, mrp: int.parse(itemMRPController.text), selling: int.parse(itemSellingController.text));
+        Navigator.pop(context, newProduct);
+      } catch(e) {
+        print(itemController.text);
+        print(e);
+      }
+
     }
   }
 
@@ -226,7 +232,7 @@ Future<dynamic> bottomSheet(context, PriceListData priceListData) {
             padding: EdgeInsets.only(
                 bottom: MediaQuery.of(context).viewInsets.bottom),
             child: Container(
-              padding: EdgeInsets.all(16.0),
+              padding: const EdgeInsets.all(16.0),
               height: 300,
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -313,7 +319,7 @@ Future<dynamic> bottomSheet(context, PriceListData priceListData) {
                   ElevatedButton(
                     style: ElevatedButton.styleFrom(elevation: 2),
                     onPressed: submit,
-                    child: Text('Add'),
+                    child: const Text('Add'),
                   )
                 ],
               ),
